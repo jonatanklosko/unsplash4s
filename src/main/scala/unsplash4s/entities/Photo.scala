@@ -2,20 +2,92 @@ package unsplash4s.entities
 
 import java.time.Instant
 
-case class Photo(id: String,
-                 createdAt: Instant,
-                 updatedAt: Instant,
-                 promotedAt: Option[Instant],
-                 width: Int,
-                 height: Int,
-                 color: String,
-                 likes: Int,
-                 likedByUser: Boolean,
-                 description: Option[String],
-                 altDescription: Option[String],
-                 urls: PhotoUrls,
-                 links: PhotoLinks, /* Do we actually need it? (easy to compute) */
-                 user: User
-                 /* TODO: all fields */) {
+import io.circe.{Decoder, HCursor}
+import unsplash4s.Client
 
+import scala.concurrent.Future
+
+case class Photo(
+  id: String,
+  createdAt: Instant,
+  updatedAt: Instant,
+  promotedAt: Option[Instant],
+  width: Int,
+  height: Int,
+  color: String,
+  likes: Int,
+  likedByUser: Boolean,
+  description: Option[String],
+  altDescription: Option[String],
+  urls: PhotoUrls,
+  links: PhotoLinks,
+  user: User,
+  exif: Option[Exif]
+) {
+
+}
+
+object Photo {
+  implicit val userDecoder: Decoder[Photo] = (c: HCursor) => {
+    for {
+      id <- c.downField("id").as[String]
+      createdAt <- c.downField("created_at").as[Instant]
+      updatedAt <- c.downField("updated_at").as[Instant]
+      promotedAt <- c.downField("promoted_at").as[Option[Instant]]
+      width <- c.downField("width").as[Int]
+      height <- c.downField("height").as[Int]
+      color <- c.downField("color").as[String]
+      likes <- c.downField("likes").as[Int]
+      likedByUser <- c.downField("liked_by_user").as[Boolean]
+      description <- c.downField("description").as[Option[String]]
+      altDescription <- c.downField("alt_description").as[Option[String]]
+      urls <- c.downField("urls").as[PhotoUrls]
+      links <- c.downField("links").as[PhotoLinks]
+      user <- c.downField("user").as[User]
+      exif <- c.downField("exif").as[Option[Exif]]
+    } yield {
+      Photo(
+        id = id,
+        createdAt = createdAt,
+        updatedAt = updatedAt,
+        promotedAt = promotedAt,
+        width = width,
+        height = height,
+        color = color,
+        likes = likes,
+        likedByUser = likedByUser,
+        description = description,
+        altDescription = altDescription,
+        urls = urls,
+        links = links,
+        user = user,
+        exif = exif
+      )
+    }
+  }
+
+  def find(id: String)(implicit client: Client): Future[Photo] = {
+    client.request[Photo](f"/photos/$id")
+  }
+
+  object PhotoOrderBy extends Enumeration {
+    type PhotoOrderBy = Value
+    val Latest = Value("latest")
+    val Oldest = Value("oldest")
+    val Popular = Value("popular")
+  }
+  import PhotoOrderBy.PhotoOrderBy
+
+  def all(
+    page: Int = 1,
+    perPage: Int = 10,
+    orderBy: PhotoOrderBy = PhotoOrderBy.Latest
+  )(implicit client: Client): Future[Seq[Photo]] = {
+    val query = Map(
+      "page" -> page.toString,
+      "per_page" -> perPage.toString,
+      "order_by" -> orderBy.toString
+    )
+    client.request[Seq[Photo]]("/photos", query)
+  }
 }
