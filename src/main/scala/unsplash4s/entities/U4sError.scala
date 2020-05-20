@@ -32,8 +32,9 @@ object U4sError {
 
   final case class JsonParsingError(
     message: String,
+    body: String,
     cause: Option[Throwable]
   ) extends U4sError(message) {
-    override def toString: String = s"JsonParsingError($message, $cause)"
+    override def toString: String = s"JsonParsingError($message, $body, $cause)"
   }
 }

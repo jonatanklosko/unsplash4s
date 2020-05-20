@@ -3,9 +3,6 @@ package unsplash4s.entities
 import java.time.Instant
 
 import io.circe.{Decoder, HCursor}
-import unsplash4s.Client
-
-import scala.concurrent.Future
 
 case class Photo(
   id: String,
@@ -23,9 +20,7 @@ case class Photo(
   links: PhotoLinks,
   user: User,
   exif: Option[Exif]
-) {
-
-}
+)
 
 object Photo {
   implicit val userDecoder: Decoder[Photo] = (c: HCursor) => {
@@ -64,30 +59,5 @@ object Photo {
         exif = exif
       )
     }
-  }
-
-  def find(id: String)(implicit client: Client): Future[Photo] = {
-    client.request[Photo](f"/photos/$id")
-  }
-
-  object PhotoOrderBy extends Enumeration {
-    type PhotoOrderBy = Value
-    val Latest = Value("latest")
-    val Oldest = Value("oldest")
-    val Popular = Value("popular")
-  }
-  import PhotoOrderBy.PhotoOrderBy
-
-  def all(
-    page: Int = 1,
-    perPage: Int = 10,
-    orderBy: PhotoOrderBy = PhotoOrderBy.Latest
-  )(implicit client: Client): Future[Seq[Photo]] = {
-    val query = Map(
-      "page" -> page.toString,
-      "per_page" -> perPage.toString,
-      "order_by" -> orderBy.toString
-    )
-    client.request[Seq[Photo]]("/photos", query)
   }
 }

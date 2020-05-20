@@ -23,7 +23,7 @@ class Client(
 ) {
   implicit val backend = AsyncHttpClientFutureBackend()
 
-  def request[T: Decoder](path: String, query: Map[String, String] = Map()): Future[T] = {
+  def request[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
     val url = apiUrl + path
     basicRequest
       .get(uri"$url?$query")
@@ -38,7 +38,7 @@ class Client(
   private def jsonResponseToEntity[T: Decoder](response: Response[String]): T = {
     if (response.isSuccess) {
       decode[T](response.body) match {
-        case Left(error) => throw JsonParsingError(error.getMessage, Some(error))
+        case Left(error) => throw JsonParsingError(error.getMessage, response.body, Some(error))
         case Right(entity) => entity
       }
     } else {

@@ -1,9 +1,6 @@
 package unsplash4s.entities
 
 import io.circe.{Decoder, HCursor}
-import unsplash4s.Client
-
-import scala.concurrent.Future
 
 case class User(
   id: String,
@@ -21,9 +18,7 @@ case class User(
   totalLikes: Int,
   totalPhotos: Int,
   acceptedTos: Boolean
-) {
-
-}
+)
 
 object User {
   implicit val userDecoder: Decoder[User] = (c: HCursor) => {
@@ -62,9 +57,5 @@ object User {
         acceptedTos = acceptedTos
       )
     }
-  }
-
-  def find(username: String)(implicit client: Client): Future[User] = {
-    client.request[User](f"/users/$username")
   }
 }

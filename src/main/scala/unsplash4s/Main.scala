@@ -1,8 +1,9 @@
 package unsplash4s
 
-import unsplash4s.entities.{Photo, User}
+import unsplash4s.entities.User
 import io.circe.parser.decode
-import unsplash4s.entities.Photo.PhotoOrderBy
+import unsplash4s.repositories.Photos
+import unsplash4s.repositories.Photos.PhotoOrientation
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
@@ -71,14 +72,23 @@ object Main {
 //      case Failure(error) => println(error)
 //    }
 //
-    Photo.all(page = 2, perPage = 5, orderBy = PhotoOrderBy.Popular).onComplete {
-      case Success(body) => println(body.map(_.toString).mkString("\n"))
-      case Failure(error) => println(error)
-    }
+//    Photos.all(page = 2, perPage = 5, orderBy = PhotoOrderBy.Popular).onComplete {
+//      case Success(body) => println(body.map(_.toString).mkString("\n"))
+//      case Failure(error) => println(error)
+//    }
 
 //      Photo.find("IlPwZyz-Pl0").onComplete {
 //        case Success(photo) => println(photo)
 //        case Failure(error) => println(error)
 //      }
+
+//    Photos.random(2, query = Some("cat")).onComplete {
+//      case Success(body) => println(body.map(_.toString).mkString("\n"))
+//      case Failure(error) => println(error)
+//    }
+    Photos.getUserPhotos("surface", page = 2, perPage = 15, orientation = Some(PhotoOrientation.Portrait)).onComplete {
+      case Success(body) => println(body.map(_.toString).mkString("\n"))
+      case Failure(error) => println(error)
+    }
   }
 }
