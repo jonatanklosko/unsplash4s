@@ -121,11 +121,14 @@ class Photos(
   }
 
   def likePhoto(id: String): Future[Json] = {
-    /* TODO: return something else than JSON? */
     httpClient.apiPost[Json](s"/photos/$id/like", "")
   }
 
   def unlikePhoto(id: String): Future[Json] = {
     httpClient.apiDelete[Json](s"/photos/$id/like")
+  }
+
+  def triggerPhotoDownload(id: String): Future[Json] = {
+    httpClient.apiGet[Json](s"/photos/$id/download")
   }
 }

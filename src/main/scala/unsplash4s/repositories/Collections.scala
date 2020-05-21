@@ -1,8 +1,10 @@
 package unsplash4s.repositories
 
+import io.circe.Json
 import unsplash4s.HttpClient
 import unsplash4s.entities.{Collection, SearchResult}
 import unsplash4s.Decoders._
+import io.circe.syntax._
 
 import scala.concurrent.Future
 
@@ -49,8 +51,45 @@ class Collections(
   }
 
   def getRelatedCollections(
-    collectionId: Int
+    id: Int
   ): Future[Seq[Collection]] = {
-    httpClient.apiGet[Seq[Collection]](s"/collections/$collectionId/related")
+    httpClient.apiGet[Seq[Collection]](s"/collections/$id/related")
+  }
+
+  def createCollection(
+    title: String,
+    description: Option[String] = None,
+    `private`: Boolean = false
+  ): Future[Collection] = {
+    val body = Json.obj(
+      "title" -> title.asJson,
+      "description" -> description.asJson,
+      "private" -> `private`.asJson
+    ).toString
+    httpClient.apiPost[Collection](s"/collections", body)
+  }
+
+  def deleteCollection(id: Int): Future[Json] = {
+    httpClient.apiDelete[Json](s"/collections/$id")
+  }
+
+  def addPhotoToCollection(
+    id: Int,
+    photoId: String
+  ): Future[Json] = {
+    val body = Json.obj(
+      "photo_id" -> photoId.asJson
+    ).toString
+    httpClient.apiPost[Json](s"/collections/$id/add", body)
+  }
+
+  def removePhotoFromCollection(
+    id: Int,
+    photoId: String
+  ): Future[Json] = {
+    val query = Map(
+      "photo_id" -> photoId,
+    )
+    httpClient.apiDelete[Json](s"/collections/$id/remove", query)
   }
 }

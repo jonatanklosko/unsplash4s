@@ -14,5 +14,5 @@ case class Collection(
   `private`: Boolean,
   shareKey: String,
   user: User,
-  coverPhoto: Photo
+  coverPhoto: Option[Photo]
 )

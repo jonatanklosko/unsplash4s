@@ -7,7 +7,7 @@ import unsplash4s.entities.AccessToken.Scope.Scope
 case class AccessToken(
   accessToken: String,
   tokenType: String,
-  scope: Seq[Scope],
+  scope: Set[Scope],
   createdAt: Instant
 )
 

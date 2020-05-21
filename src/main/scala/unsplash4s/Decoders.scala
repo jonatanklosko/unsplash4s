@@ -11,7 +11,7 @@ object Decoders {
     for {
       accessToken <- c.downField("access_token").as[String]
       tokenType <- c.downField("token_type").as[String]
-      scope <- c.downField("scope").as[String].map(scopeString => scopeString.split(" ").map(Scope.withName))
+      scope <- c.downField("scope").as[String].map(scopeString => scopeString.split(" ").map(Scope.withName).toSet)
       createdAt <- c.downField("created_at").as[Int].map(Instant.ofEpochSecond(_))
     } yield {
       AccessToken(
@@ -36,7 +36,7 @@ object Decoders {
       isPrivate <- c.downField("private").as[Boolean]
       shareKey <- c.downField("share_key").as[String]
       user <- c.downField("user").as[User]
-      coverPhoto <- c.downField("cover_photo").as[Photo]
+      coverPhoto <- c.downField("cover_photo").as[Option[Photo]]
     } yield {
       Collection(
         id = id,

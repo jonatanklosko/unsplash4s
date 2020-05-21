@@ -1,5 +1,6 @@
 package unsplash4s.repositories
 
+import io.circe.Json
 import io.circe.syntax._
 import sttp.client._
 import unsplash4s.{HttpClient, UnsplashAppConfig}
@@ -15,7 +16,7 @@ class OAuth(
   appConfig: UnsplashAppConfig
 ) {
   def authorizationUrl(
-    scope: Seq[Scope] = Seq(Scope.Public)
+    scope: Set[Scope] = Set(Scope.Public)
   ): String = {
     val query = Map(
       "client_id" -> appConfig.applicationAccessKey,
@@ -28,13 +29,13 @@ class OAuth(
   }
 
   def getAccessToken(code: String): Future[AccessToken] = {
-    val body = Map(
-      "client_id" -> appConfig.applicationAccessKey,
-      "client_secret" -> appConfig.applicationSecret.getOrElse { throw new Exception("Missing secret.") },
-      "redirect_uri" -> appConfig.oauthRedirectUri.getOrElse { throw new Exception("Missing redirect URI.") },
-      "code" -> code,
-      "grant_type" -> "authorization_code"
-    ).asJson.toString
+    val body = Json.obj(
+      "client_id" -> appConfig.applicationAccessKey.asJson,
+      "client_secret" -> appConfig.applicationSecret.asJson,
+      "redirect_uri" -> appConfig.oauthRedirectUri.asJson,
+      "code" -> code.asJson,
+      "grant_type" -> "authorization_code".asJson
+    ).toString
     httpClient.oauthPost[AccessToken]("/token", body)
   }
 }

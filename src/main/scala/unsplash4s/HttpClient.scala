@@ -55,13 +55,11 @@ class HttpClient(
   }
 
   def apiPost[T: Decoder](path: String, body: String): Future[T] = {
-    val url = appConfig.apiUrl + path
-    post(uri"$url", body)
+    post(uri"${appConfig.apiUrl + path}", body)
   }
 
-  def apiDelete[T: Decoder](path: String): Future[T] = {
-    val url = appConfig.apiUrl + path
-    delete(uri"$url")
+  def apiDelete[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
+    delete(uri"${appConfig.apiUrl + path}?$query")
   }
 
   def oauthPost[T: Decoder](path: String, body: String): Future[T] = {
