@@ -5,7 +5,7 @@ import sttp.client._
 import io.circe.parser.decode
 import io.circe.parser._
 import io.circe.Decoder
-import sttp.model.StatusCode
+import sttp.model.{StatusCode, Uri}
 import unsplash4s.entities.U4sError.{ForbiddenError, JsonParsingError, NotFoundError, UnauthorizedError, UnhandledResponseError}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,13 +13,17 @@ import scala.concurrent.Future
 
 object Client {
   val DefaultApiUrl = "https://api.unsplash.com"
+  val DefaultOAuthUrl = "https://unsplash.com/oauth"
   val ApiVersion = "v1"
 }
 
 class Client(
   val applicationAccessKey: String,
   val apiUrl: String = Client.DefaultApiUrl,
-  val applicationSecret: Option[String] = None
+  val oauthUrl: String = Client.DefaultOAuthUrl,
+  val applicationSecret: Option[String] = None,
+  val oauthRedirectUri: Option[String] = None,
+  val accessToken: Option[String] = None
 ) {
   implicit val backend = AsyncHttpClientFutureBackend()
 
@@ -28,11 +32,30 @@ class Client(
     basicRequest
       .get(uri"$url?$query")
       .contentType("application/json")
-      .header("Authorization", f"Client-ID $applicationAccessKey")
+      .header("Authorization", authorizationHeader)
       .header("Accept-Version", Client.ApiVersion)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
+  }
+
+  def postRequest[T: Decoder](url: Uri, body: String): Future[T] = {
+    basicRequest
+      .post(url)
+      .body(body)
+      .contentType("application/json")
+      .header("Authorization", authorizationHeader)
+      .header("Accept-Version", Client.ApiVersion)
+      .response(asStringAlways)
+      .send()
+      .map(jsonResponseToEntity[T])
+  }
+
+  private def authorizationHeader: String = {
+    accessToken match {
+      case Some(token) => s"Bearer $token"
+      case None => s"Client-ID $applicationAccessKey"
+    }
   }
 
   private def jsonResponseToEntity[T: Decoder](response: Response[String]): T = {

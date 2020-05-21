@@ -1,7 +1,10 @@
 package unsplash4s.repositories
 
+import io.circe.Json
 import unsplash4s.Client
 import unsplash4s.entities.Photo
+import unsplash4s.Decoders._
+import sttp.client._
 
 import scala.concurrent.Future
 
@@ -30,7 +33,7 @@ object Photos {
   import ContentFilter.ContentFilter
 
   def getPhoto(id: String)(implicit client: Client): Future[Photo] = {
-    client.request[Photo](f"/photos/$id")
+    client.request[Photo](s"/photos/$id")
   }
 
   def getPhotos(
@@ -80,6 +83,11 @@ object Photos {
       "order_by" -> orderBy,
       "orientation" -> orientation
     )
-    client.request[Seq[Photo]](f"/users/$username/photos", query)
+    client.request[Seq[Photo]](s"/users/$username/photos", query)
+  }
+
+  // TODO: return something else than JSON? perhaps bool
+  def likePhoto(id: String)(implicit client: Client): Future[Json] = {
+    client.postRequest[Json](uri"${client.apiUrl}/photos/$id/like", "")
   }
 }

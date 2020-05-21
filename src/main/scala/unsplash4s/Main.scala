@@ -2,11 +2,13 @@ package unsplash4s
 
 import unsplash4s.entities.User
 import io.circe.parser.decode
-import unsplash4s.repositories.Photos
-import unsplash4s.repositories.Photos.PhotoOrientation
+import unsplash4s.repositories.{OAuth, Photos, Users}
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.io.StdIn
 import scala.util.{Failure, Success}
+import unsplash4s.Decoders._
+import unsplash4s.entities.AccessToken.Scope
 
 object Main {
 
@@ -25,7 +27,7 @@ object Main {
         |    "bio": null,
         |    "location": null,
         |    "links": {
-        |        "self": "https://api.unsplash.com/users/jonatanklosko",
+        |        "sels": "https://api.unsplash.com/users/jonatanklosko",
         |        "html": "https://unsplash.com/@jonatanklosko",
         |        "photos": "https://api.unsplash.com/users/jonatanklosko/photos",
         |        "likes": "https://api.unsplash.com/users/jonatanklosko/likes",
@@ -66,8 +68,34 @@ object Main {
       case Right(user) => println(user)
     }
 
-    implicit val client: Client = new Client("q5d_MY49aqBFbJ5rY4KyyN_MHivhhwu4hbcJ3EMJUIk");
-//    User.find("jonatanklosko").onComplete {
+    implicit val client: Client = new Client(
+      applicationAccessKey = "q5d_MY49aqBFbJ5rY4KyyN_MHivhhwu4hbcJ3EMJUIk",
+      applicationSecret = Some("OzReyy3mDJn2X2LOJpUdj9NksSNxZcWE0nrr2yovSYY"),
+      oauthRedirectUri = Some("urn:ietf:wg:oauth:2.0:oob")
+    );
+
+    println(s"Please get a code from: ${OAuth.authorizationUrl(scope = Seq(Scope.Public, Scope.WriteLikes))}")
+    print("Enter the code: ")
+    val code = StdIn.readLine()
+    OAuth.getAccessToken(code).onComplete {
+      case Success(token) => {
+        println(token)
+        implicit val client: Client = new Client(
+          applicationAccessKey = "q5d_MY49aqBFbJ5rY4KyyN_MHivhhwu4hbcJ3EMJUIk",
+          applicationSecret = Some("OzReyy3mDJn2X2LOJpUdj9NksSNxZcWE0nrr2yovSYY"),
+          oauthRedirectUri = Some("urn:ietf:wg:oauth:2.0:oob"),
+          accessToken = Some(token.accessToken)
+        );
+        Photos.likePhoto("xulIYVIbYIc").onComplete {
+          case Success(_) => println("liked")
+          case Failure(error) => println(error)
+        }
+      }
+      case Failure(error) => println(error)
+    }
+
+
+//    Users.getUser("jonatanklosko").onComplete {
 //      case Success(user) => println(user.name)
 //      case Failure(error) => println(error)
 //    }
@@ -86,9 +114,9 @@ object Main {
 //      case Success(body) => println(body.map(_.toString).mkString("\n"))
 //      case Failure(error) => println(error)
 //    }
-    Photos.getUserPhotos("surface", page = 2, perPage = 15, orientation = Some(PhotoOrientation.Portrait)).onComplete {
-      case Success(body) => println(body.map(_.toString).mkString("\n"))
-      case Failure(error) => println(error)
-    }
+//    Photos.getUserPhotos("surface", page = 2, perPage = 15, orientation = Some(PhotoOrientation.Portrait)).onComplete {
+//      case Success(body) => println(body.map(_.toString).mkString("\n"))
+//      case Failure(error) => println(error)
+//    }
   }
 }
