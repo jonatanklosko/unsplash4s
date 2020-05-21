@@ -2,7 +2,7 @@ package unsplash4s.repositories
 
 import io.circe.Json
 import unsplash4s.HttpClient
-import unsplash4s.entities.Photo
+import unsplash4s.entities.{Photo, SearchResult}
 import unsplash4s.Decoders._
 
 import scala.concurrent.Future
@@ -87,7 +87,31 @@ class Photos(
     httpClient.apiGet[Seq[Photo]](s"/users/$username/photos", query)
   }
 
+  def searchPhotos(
+    query: String,
+    page: Int = 1,
+    perPage: Int = 10,
+    collectionIds: Option[Seq[Int]] = None,
+    orientation: Option[PhotoOrientation] = None,
+    contentFilter: Option[ContentFilter] = None
+  ): Future[SearchResult[Photo]] = {
+    val queryParams = Map(
+      "query" -> query,
+      "page" -> page,
+      "perPage" -> perPage,
+      "collections" -> collectionIds.map(_.mkString(",")),
+      "orientation" -> orientation,
+      "contentFilter" -> contentFilter
+    )
+    httpClient.apiGet[SearchResult[Photo]](s"/search/photos", queryParams)
+  }
+
   def likePhoto(id: String): Future[Json] = {
+    /* TODO: return something else than JSON? */
     httpClient.apiPost[Json](s"/photos/$id/like", "")
+  }
+
+  def unlikePhoto(id: String): Future[Json] = {
+    httpClient.apiDelete[Json](s"/photos/$id/like")
   }
 }

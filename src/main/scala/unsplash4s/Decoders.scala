@@ -3,7 +3,7 @@ package unsplash4s
 import java.time.Instant
 
 import io.circe.{Decoder, HCursor}
-import unsplash4s.entities.{AccessToken, Exif, Photo, PhotoLinks, PhotoUrls, ProfileImage, User}
+import unsplash4s.entities.{AccessToken, Exif, Photo, PhotoLinks, PhotoUrls, ProfileImage, SearchResult, User}
 import unsplash4s.entities.AccessToken.Scope
 
 object Decoders {
@@ -83,7 +83,7 @@ object Decoders {
 
   implicit val photoLinksDecoder: Decoder[PhotoLinks] = (c: HCursor) => {
     for {
-      self <- c.downField("sels").as[String]
+      self <- c.downField("self").as[String]
       html <- c.downField("html").as[String]
       download <- c.downField("download").as[String]
       downloadLocation <- c.downField("download_location").as[String]
@@ -125,6 +125,20 @@ object Decoders {
         small = small,
         medium = medium,
         large = large
+      )
+    }
+  }
+
+  implicit def searchResultDecoder[T](implicit D: Decoder[T]): Decoder[SearchResult[T]] = (c: HCursor) => {
+    for {
+      total <- c.downField("total").as[Int]
+      totalPages <- c.downField("total_pages").as[Int]
+      results <- c.downField("results").as[Seq[T]]
+    } yield {
+      SearchResult(
+        total = total,
+        totalPages = totalPages,
+        results = results
       )
     }
   }

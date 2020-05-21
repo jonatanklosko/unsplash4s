@@ -7,8 +7,7 @@ import scala.io.StdIn
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object Main {
-
+object LikePhoto {
   def main(args: Array[String]): Unit = {
     val unsplashAppConfig = UnsplashAppConfig(
       applicationAccessKey = "q5d_MY49aqBFbJ5rY4KyyN_MHivhhwu4hbcJ3EMJUIk",
@@ -26,7 +25,8 @@ object Main {
       .flatMap(token => {
         println(s"Obtained access token: $token")
         val userUnsplash = new Unsplash(unsplashAppConfig, Some(token.accessToken))
-        userUnsplash.photos.likePhoto("xulIYVIbYIc")
+        val photoId = "xulIYVIbYIc"
+        userUnsplash.photos.likePhoto(photoId)
       })
       .onComplete {
         case Success(_) => println("Photo liked!")

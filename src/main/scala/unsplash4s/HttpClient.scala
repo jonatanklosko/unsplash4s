@@ -39,6 +39,17 @@ class HttpClient(
       .map(jsonResponseToEntity[T])
   }
 
+  def delete[T: Decoder](url: Uri): Future[T] = {
+    basicRequest
+      .delete(url)
+      .contentType("application/json")
+      .header("Authorization", authorizationHeader)
+      .header("Accept-Version", appConfig.apiVersion)
+      .response(asStringAlways)
+      .send()
+      .map(jsonResponseToEntity[T])
+  }
+
   def apiGet[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
     get(uri"${appConfig.apiUrl + path}?$query")
   }
@@ -46,6 +57,11 @@ class HttpClient(
   def apiPost[T: Decoder](path: String, body: String): Future[T] = {
     val url = appConfig.apiUrl + path
     post(uri"$url", body)
+  }
+
+  def apiDelete[T: Decoder](path: String): Future[T] = {
+    val url = appConfig.apiUrl + path
+    delete(uri"$url")
   }
 
   def oauthPost[T: Decoder](path: String, body: String): Future[T] = {
