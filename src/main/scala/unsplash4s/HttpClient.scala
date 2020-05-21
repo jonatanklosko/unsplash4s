@@ -8,53 +8,55 @@ import io.circe.Decoder
 import sttp.model.{StatusCode, Uri}
 import unsplash4s.entities.U4sError.{ForbiddenError, JsonParsingError, NotFoundError, UnauthorizedError, UnhandledResponseError}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-object Client {
-  val DefaultApiUrl = "https://api.unsplash.com"
-  val DefaultOAuthUrl = "https://unsplash.com/oauth"
-  val ApiVersion = "v1"
-}
-
-class Client(
-  val applicationAccessKey: String,
-  val apiUrl: String = Client.DefaultApiUrl,
-  val oauthUrl: String = Client.DefaultOAuthUrl,
-  val applicationSecret: Option[String] = None,
-  val oauthRedirectUri: Option[String] = None,
-  val accessToken: Option[String] = None
-) {
+class HttpClient(
+  appConfig: UnsplashAppConfig,
+  accessToken: Option[String] = None
+)(implicit ec: ExecutionContext = ExecutionContext.global) {
   implicit val backend = AsyncHttpClientFutureBackend()
 
-  def request[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
-    val url = apiUrl + path
+  def get[T: Decoder](uri: Uri): Future[T] = {
     basicRequest
-      .get(uri"$url?$query")
+      .get(uri)
       .contentType("application/json")
       .header("Authorization", authorizationHeader)
-      .header("Accept-Version", Client.ApiVersion)
+      .header("Accept-Version", appConfig.apiVersion)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
   }
 
-  def postRequest[T: Decoder](url: Uri, body: String): Future[T] = {
+  def post[T: Decoder](url: Uri, body: String): Future[T] = {
     basicRequest
       .post(url)
       .body(body)
       .contentType("application/json")
       .header("Authorization", authorizationHeader)
-      .header("Accept-Version", Client.ApiVersion)
+      .header("Accept-Version", appConfig.apiVersion)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
   }
 
+  def apiGet[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
+    get(uri"${appConfig.apiUrl + path}?$query")
+  }
+
+  def apiPost[T: Decoder](path: String, body: String): Future[T] = {
+    val url = appConfig.apiUrl + path
+    post(uri"$url", body)
+  }
+
+  def oauthPost[T: Decoder](path: String, body: String): Future[T] = {
+    val url = appConfig.oauthUrl + path
+    post(uri"$url", body)
+  }
+
   private def authorizationHeader: String = {
     accessToken match {
       case Some(token) => s"Bearer $token"
-      case None => s"Client-ID $applicationAccessKey"
+      case None => s"Client-ID ${appConfig.applicationAccessKey}"
     }
   }
 

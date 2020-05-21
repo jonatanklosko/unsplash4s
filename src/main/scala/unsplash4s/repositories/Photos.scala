@@ -1,14 +1,15 @@
 package unsplash4s.repositories
 
 import io.circe.Json
-import unsplash4s.Client
+import unsplash4s.HttpClient
 import unsplash4s.entities.Photo
 import unsplash4s.Decoders._
-import sttp.client._
 
 import scala.concurrent.Future
 
-object Photos {
+class Photos(
+  httpClient: HttpClient
+) {
   object PhotoOrderBy extends Enumeration {
     type PhotoOrderBy = Value
     val Latest = Value("latest")
@@ -32,21 +33,21 @@ object Photos {
   }
   import ContentFilter.ContentFilter
 
-  def getPhoto(id: String)(implicit client: Client): Future[Photo] = {
-    client.request[Photo](s"/photos/$id")
+  def getPhoto(id: String): Future[Photo] = {
+    httpClient.apiGet[Photo](s"/photos/$id")
   }
 
   def getPhotos(
     page: Int = 1,
     perPage: Int = 10,
     orderBy: PhotoOrderBy = PhotoOrderBy.Latest
-  )(implicit client: Client): Future[Seq[Photo]] = {
+  ): Future[Seq[Photo]] = {
     val query = Map(
       "page" -> page,
       "per_page" -> perPage,
       "order_by" -> orderBy
     )
-    client.request[Seq[Photo]]("/photos", query)
+    httpClient.apiGet[Seq[Photo]]("/photos", query)
   }
 
   def getRandomPhotos(
@@ -57,7 +58,7 @@ object Photos {
     collectionIds: Option[Seq[Int]] = None,
     orientation: Option[PhotoOrientation] = None,
     contentFilter: Option[ContentFilter] = None
-  )(implicit client: Client): Future[Seq[Photo]] = {
+  ): Future[Seq[Photo]] = {
     val queryParams = Map(
       "count" -> count,
       "query" -> query,
@@ -67,7 +68,7 @@ object Photos {
       "orientation" -> orientation,
       "contentFilter" -> contentFilter
     )
-    client.request[Seq[Photo]]("/photos/random", queryParams)
+    httpClient.apiGet[Seq[Photo]]("/photos/random", queryParams)
   }
 
   def getUserPhotos(
@@ -76,18 +77,17 @@ object Photos {
     perPage: Int = 10,
     orderBy: PhotoOrderBy = PhotoOrderBy.Latest,
     orientation: Option[PhotoOrientation] = None
-  )(implicit client: Client): Future[Seq[Photo]] = {
+  ): Future[Seq[Photo]] = {
     val query = Map(
       "page" -> page,
       "per_page" -> perPage,
       "order_by" -> orderBy,
       "orientation" -> orientation
     )
-    client.request[Seq[Photo]](s"/users/$username/photos", query)
+    httpClient.apiGet[Seq[Photo]](s"/users/$username/photos", query)
   }
 
-  // TODO: return something else than JSON? perhaps bool
-  def likePhoto(id: String)(implicit client: Client): Future[Json] = {
-    client.postRequest[Json](uri"${client.apiUrl}/photos/$id/like", "")
+  def likePhoto(id: String): Future[Json] = {
+    httpClient.apiPost[Json](s"/photos/$id/like", "")
   }
 }
