@@ -22,9 +22,16 @@ object Search {
       case Failure(error) => println((error))
     }
 
-    unsplash.users.searchUsers("sherlock").onComplete {
+    unsplash.users.searchUsers("john").onComplete {
       case Success(SearchResult(total, totalPages, results)) => {
-        println(s"User results for search 'sherlock':\n- total: $total\n - total pages: $totalPages\n - this page: ${results.map(_.id).mkString(", ")}")
+        println(s"User results for search 'john':\n- total: $total\n - total pages: $totalPages\n - this page: ${results.map(_.name).mkString(", ")}")
+      }
+      case Failure(error) => println((error))
+    }
+
+    unsplash.collections.searchCollections("football").onComplete {
+      case Success(SearchResult(total, totalPages, results)) => {
+        println(s"Collection results for search 'basketball':\n- total: $total\n - total pages: $totalPages\n - this page: ${results.map(_.title).mkString(", ")}")
       }
       case Failure(error) => println((error))
     }

@@ -1,6 +1,6 @@
 package unsplash4s
 
-import unsplash4s.repositories.{OAuth, Photos, Users}
+import unsplash4s.repositories.{Collections, OAuth, Photos, Users}
 
 class Unsplash(
   appConfig: UnsplashAppConfig,
@@ -11,4 +11,5 @@ class Unsplash(
   lazy val oauth = new OAuth(httpClient, appConfig)
   lazy val photos = new Photos(httpClient)
   lazy val users = new Users(httpClient)
+  lazy val collections = new Collections(httpClient)
 }

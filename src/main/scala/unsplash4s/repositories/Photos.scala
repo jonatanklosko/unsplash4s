@@ -87,6 +87,20 @@ class Photos(
     httpClient.apiGet[Seq[Photo]](s"/users/$username/photos", query)
   }
 
+  def getCollectionPhotos(
+    collectionId: Int,
+    page: Int = 1,
+    perPage: Int = 10,
+    orientation: Option[PhotoOrientation] = None
+  ): Future[Seq[Photo]] = {
+    val query = Map(
+      "page" -> page,
+      "per_page" -> perPage,
+      "orientation" -> orientation
+    )
+    httpClient.apiGet[Seq[Photo]](s"/collections/$collectionId/photos", query)
+  }
+
   def searchPhotos(
     query: String,
     page: Int = 1,

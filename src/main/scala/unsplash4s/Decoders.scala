@@ -3,7 +3,7 @@ package unsplash4s
 import java.time.Instant
 
 import io.circe.{Decoder, HCursor}
-import unsplash4s.entities.{AccessToken, Exif, Photo, PhotoLinks, PhotoUrls, ProfileImage, SearchResult, User}
+import unsplash4s.entities.{AccessToken, Collection, Exif, Photo, PhotoLinks, PhotoUrls, ProfileImage, SearchResult, User}
 import unsplash4s.entities.AccessToken.Scope
 
 object Decoders {
@@ -19,6 +19,38 @@ object Decoders {
         tokenType = tokenType,
         scope = scope,
         createdAt = createdAt
+      )
+    }
+  }
+
+  implicit val collectionDecoder: Decoder[Collection] = (c: HCursor) => {
+    for {
+      id <- c.downField("id").as[Int]
+      title <- c.downField("title").as[String]
+      description <- c.downField("description").as[Option[String]]
+      publishedAt <- c.downField("published_at").as[Instant]
+      updatedAt <- c.downField("updated_at").as[Instant]
+      curated <- c.downField("curated").as[Boolean]
+      featured <- c.downField("featured").as[Boolean]
+      totalPhotos <- c.downField("total_photos").as[Int]
+      isPrivate <- c.downField("private").as[Boolean]
+      shareKey <- c.downField("share_key").as[String]
+      user <- c.downField("user").as[User]
+      coverPhoto <- c.downField("cover_photo").as[Photo]
+    } yield {
+      Collection(
+        id = id,
+        title = title,
+        description = description,
+        publishedAt = publishedAt,
+        updatedAt = updatedAt,
+        curated = curated,
+        featured = featured,
+        totalPhotos = totalPhotos,
+        `private` = isPrivate,
+        shareKey = shareKey,
+        user = user,
+        coverPhoto = coverPhoto
       )
     }
   }
