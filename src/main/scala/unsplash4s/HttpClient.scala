@@ -1,12 +1,11 @@
 package unsplash4s
 
-import sttp.client.asynchttpclient.future.AsyncHttpClientFutureBackend
-import sttp.client._
-import io.circe.parser.decode
-import io.circe.parser._
 import io.circe.Decoder
+import io.circe.parser.{decode, _}
+import sttp.client._
+import sttp.client.asynchttpclient.future.AsyncHttpClientFutureBackend
 import sttp.model.{StatusCode, Uri}
-import unsplash4s.entities.U4sError.{ForbiddenError, JsonParsingError, NotFoundError, UnauthorizedError, UnhandledResponseError}
+import unsplash4s.entities.U4sError._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,37 +13,31 @@ class HttpClient(
   appConfig: UnsplashAppConfig,
   accessToken: Option[String] = None
 )(implicit ec: ExecutionContext = ExecutionContext.global) {
-  implicit val backend = AsyncHttpClientFutureBackend()
+  implicit val sttpBackend = AsyncHttpClientFutureBackend()
 
   def get[T: Decoder](uri: Uri): Future[T] = {
     basicRequest
       .get(uri)
-      .contentType("application/json")
-      .header("Authorization", authorizationHeader)
-      .header("Accept-Version", appConfig.apiVersion)
+      .headers(headers)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
   }
 
-  def post[T: Decoder](url: Uri, body: String): Future[T] = {
+  def post[T: Decoder](uri: Uri, body: Option[String]): Future[T] = {
     basicRequest
-      .post(url)
-      .body(body)
-      .contentType("application/json")
-      .header("Authorization", authorizationHeader)
-      .header("Accept-Version", appConfig.apiVersion)
+      .post(uri)
+      .body(body.getOrElse(""))
+      .headers(headers)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
   }
 
-  def delete[T: Decoder](url: Uri): Future[T] = {
+  def delete[T: Decoder](uri: Uri): Future[T] = {
     basicRequest
-      .delete(url)
-      .contentType("application/json")
-      .header("Authorization", authorizationHeader)
-      .header("Accept-Version", appConfig.apiVersion)
+      .delete(uri)
+      .headers(headers)
       .response(asStringAlways)
       .send()
       .map(jsonResponseToEntity[T])
@@ -54,7 +47,7 @@ class HttpClient(
     get(uri"${appConfig.apiUrl + path}?$query")
   }
 
-  def apiPost[T: Decoder](path: String, body: String): Future[T] = {
+  def apiPost[T: Decoder](path: String, body: Option[String]): Future[T] = {
     post(uri"${appConfig.apiUrl + path}", body)
   }
 
@@ -62,9 +55,17 @@ class HttpClient(
     delete(uri"${appConfig.apiUrl + path}?$query")
   }
 
-  def oauthPost[T: Decoder](path: String, body: String): Future[T] = {
+  def oauthPost[T: Decoder](path: String, body: Option[String]): Future[T] = {
     val url = appConfig.oauthUrl + path
     post(uri"$url", body)
+  }
+
+  private def headers: Map[String, String] = {
+    Map(
+      "Content-Type" -> "application/json",
+      "Authorization" -> authorizationHeader,
+      "Accept-Version" -> appConfig.apiVersion
+    )
   }
 
   private def authorizationHeader: String = {

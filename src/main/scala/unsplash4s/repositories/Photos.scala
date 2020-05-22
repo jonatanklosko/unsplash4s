@@ -1,38 +1,19 @@
 package unsplash4s.repositories
 
 import io.circe.Json
+import unsplash4s.Decoders._
 import unsplash4s.HttpClient
 import unsplash4s.entities.{Photo, SearchResult}
-import unsplash4s.Decoders._
+import unsplash4s.repositories.Photos.ContentFilter.ContentFilter
+import unsplash4s.repositories.Photos.PhotoOrderBy
+import unsplash4s.repositories.Photos.PhotoOrderBy.PhotoOrderBy
+import unsplash4s.repositories.Photos.PhotoOrientation.PhotoOrientation
 
 import scala.concurrent.Future
 
 class Photos(
   httpClient: HttpClient
 ) {
-  object PhotoOrderBy extends Enumeration {
-    type PhotoOrderBy = Value
-    val Latest = Value("latest")
-    val Oldest = Value("oldest")
-    val Popular = Value("popular")
-  }
-  import PhotoOrderBy.PhotoOrderBy
-
-  object PhotoOrientation extends Enumeration {
-    type PhotoOrientation = Value
-    val Landscape = Value("landscape")
-    val Portrait = Value("portrait")
-    val Squarish = Value("squarish")
-  }
-  import PhotoOrientation.PhotoOrientation
-
-  object ContentFilter extends Enumeration {
-    type ContentFilter = Value
-    val Low = Value("low")
-    val High = Value("high")
-  }
-  import ContentFilter.ContentFilter
-
   def getPhoto(id: String): Future[Photo] = {
     httpClient.apiGet[Photo](s"/photos/$id")
   }
@@ -121,7 +102,7 @@ class Photos(
   }
 
   def likePhoto(id: String): Future[Json] = {
-    httpClient.apiPost[Json](s"/photos/$id/like", "")
+    httpClient.apiPost[Json](s"/photos/$id/like", None)
   }
 
   def unlikePhoto(id: String): Future[Json] = {
@@ -130,5 +111,27 @@ class Photos(
 
   def triggerPhotoDownload(id: String): Future[Json] = {
     httpClient.apiGet[Json](s"/photos/$id/download")
+  }
+}
+
+object Photos {
+  object PhotoOrderBy extends Enumeration {
+    type PhotoOrderBy = Value
+    val Latest = Value("latest")
+    val Oldest = Value("oldest")
+    val Popular = Value("popular")
+  }
+
+  object PhotoOrientation extends Enumeration {
+    type PhotoOrientation = Value
+    val Landscape = Value("landscape")
+    val Portrait = Value("portrait")
+    val Squarish = Value("squarish")
+  }
+
+  object ContentFilter extends Enumeration {
+    type ContentFilter = Value
+    val Low = Value("low")
+    val High = Value("high")
   }
 }

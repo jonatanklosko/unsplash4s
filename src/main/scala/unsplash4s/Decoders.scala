@@ -3,8 +3,8 @@ package unsplash4s
 import java.time.Instant
 
 import io.circe.{Decoder, HCursor}
-import unsplash4s.entities.{AccessToken, Collection, Exif, Photo, PhotoLinks, PhotoUrls, ProfileImage, SearchResult, User}
 import unsplash4s.entities.AccessToken.Scope
+import unsplash4s.entities._
 
 object Decoders {
   implicit val accessTokenDecoder: Decoder[AccessToken] = (c: HCursor) => {

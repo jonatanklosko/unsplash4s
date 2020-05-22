@@ -3,11 +3,11 @@ package unsplash4s.repositories
 import io.circe.Json
 import io.circe.syntax._
 import sttp.client._
-import unsplash4s.{HttpClient, UnsplashAppConfig}
-import unsplash4s.entities.AccessToken
 import unsplash4s.Decoders._
+import unsplash4s.entities.AccessToken
 import unsplash4s.entities.AccessToken.Scope
 import unsplash4s.entities.AccessToken.Scope.Scope
+import unsplash4s.{HttpClient, UnsplashAppConfig}
 
 import scala.concurrent.Future
 
@@ -36,6 +36,6 @@ class OAuth(
       "code" -> code.asJson,
       "grant_type" -> "authorization_code".asJson
     ).toString
-    httpClient.oauthPost[AccessToken]("/token", body)
+    httpClient.oauthPost[AccessToken]("/token", Some(body))
   }
 }

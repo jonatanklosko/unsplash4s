@@ -1,10 +1,10 @@
 package unsplash4s.repositories
 
 import io.circe.Json
+import io.circe.syntax._
+import unsplash4s.Decoders._
 import unsplash4s.HttpClient
 import unsplash4s.entities.{Collection, SearchResult}
-import unsplash4s.Decoders._
-import io.circe.syntax._
 
 import scala.concurrent.Future
 
@@ -66,7 +66,7 @@ class Collections(
       "description" -> description.asJson,
       "private" -> `private`.asJson
     ).toString
-    httpClient.apiPost[Collection](s"/collections", body)
+    httpClient.apiPost[Collection](s"/collections", Some(body))
   }
 
   def deleteCollection(id: Int): Future[Json] = {
@@ -80,7 +80,7 @@ class Collections(
     val body = Json.obj(
       "photo_id" -> photoId.asJson
     ).toString
-    httpClient.apiPost[Json](s"/collections/$id/add", body)
+    httpClient.apiPost[Json](s"/collections/$id/add", Some(body))
   }
 
   def removePhotoFromCollection(
