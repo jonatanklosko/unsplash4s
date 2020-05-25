@@ -17,5 +17,7 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "com.softwaremill.sttp.client" %% "core" % "2.1.2",
   "com.softwaremill.sttp.client" %% "async-http-client-backend-future" % "2.1.2",
-  "org.slf4j" % "slf4j-nop" % "1.7.30"
+  "org.slf4j" % "slf4j-nop" % "1.7.30",
+  "org.scalactic" %% "scalactic" % "3.1.2",
+  "org.scalatest" %% "scalatest" % "3.1.2" % "test"
 )

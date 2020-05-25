@@ -12,8 +12,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class HttpClient(
   appConfig: UnsplashAppConfig,
   accessToken: Option[String] = None
-)(implicit ec: ExecutionContext = ExecutionContext.global) {
-  implicit val sttpBackend = AsyncHttpClientFutureBackend()
+)(
+  implicit ec: ExecutionContext = ExecutionContext.global,
+  sttpBackend: SttpBackend[Future, Nothing, NothingT] = AsyncHttpClientFutureBackend()
+) {
 
   def get[T: Decoder](uri: Uri): Future[T] = {
     basicRequest
