@@ -27,7 +27,7 @@ class UsersSpec extends BaseIntegrationSpec {
     user.username shouldEqual username
   }
 
-  "Users > searchUsers" should "return a future resolving to the matching users" in {
+  "Users > searchUsers" should "return a future resolving to a list of matching users" in {
     val query = "john"
     val unsplash = getUnsplash(stubBackend => {
       stubBackend
