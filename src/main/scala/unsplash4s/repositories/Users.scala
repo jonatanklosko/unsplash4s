@@ -21,7 +21,7 @@ class Users(
     val queryParams = Map(
       "query" -> query,
       "page" -> page,
-      "perPage" -> perPage
+      "per_page" -> perPage
     )
     httpClient.apiGet[SearchResult[User]](s"/search/users", queryParams)
   }

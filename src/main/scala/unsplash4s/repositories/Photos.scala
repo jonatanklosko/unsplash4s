@@ -49,7 +49,7 @@ class Photos(
       "username" -> username,
       "collections" -> collectionIds.map(_.mkString(",")),
       "orientation" -> orientation,
-      "contentFilter" -> contentFilter
+      "content_filter" -> contentFilter
     )
     httpClient.apiGet[Seq[Photo]]("/photos/random", queryParams)
   }
@@ -95,10 +95,10 @@ class Photos(
     val queryParams = Map(
       "query" -> query,
       "page" -> page,
-      "perPage" -> perPage,
+      "per_page" -> perPage,
       "collections" -> collectionIds.map(_.mkString(",")),
       "orientation" -> orientation,
-      "contentFilter" -> contentFilter
+      "content_filter" -> contentFilter
     )
     httpClient.apiGet[SearchResult[Photo]](s"/search/photos", queryParams)
   }
