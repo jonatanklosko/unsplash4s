@@ -12,7 +12,7 @@ class Collections(
   httpClient: HttpClient
 )(
   implicit ec: ExecutionContext = ExecutionContext.global
-) {
+) extends BaseRepository {
   def getCollection(id: Int): Future[Collection] = {
     httpClient.apiGet[Collection](s"/collections/$id")
   }
@@ -21,7 +21,7 @@ class Collections(
     page: Int = 1,
     perPage: Int = 10
   ): Future[Seq[Collection]] = {
-    val query = Map(
+    val query = queryParamsMap(
       "page" -> page,
       "per_page" -> perPage
     )
@@ -32,7 +32,7 @@ class Collections(
     page: Int = 1,
     perPage: Int = 10
   ): Future[Seq[Collection]] = {
-    val query = Map(
+    val query = queryParamsMap(
       "page" -> page,
       "per_page" -> perPage
     )
@@ -44,7 +44,7 @@ class Collections(
     page: Int = 1,
     perPage: Int = 10
   ): Future[SearchResult[Collection]] = {
-    val queryParams = Map(
+    val queryParams = queryParamsMap(
       "query" -> query,
       "page" -> page,
       "per_page" -> perPage
@@ -91,7 +91,7 @@ class Collections(
     id: Int,
     photoId: String
   ): Future[Unit] = {
-    val query = Map(
+    val query = queryParamsMap(
       "photo_id" -> photoId,
     )
     httpClient.apiDelete[Json](s"/collections/$id/remove", query)

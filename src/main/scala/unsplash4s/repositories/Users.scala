@@ -8,7 +8,7 @@ import scala.concurrent.Future
 
 class Users(
   httpClient: HttpClient
-) {
+) extends BaseRepository {
   def getUser(username: String): Future[User] = {
     httpClient.apiGet[User](s"/users/$username")
   }
@@ -18,7 +18,7 @@ class Users(
     page: Int = 1,
     perPage: Int = 10
   ): Future[SearchResult[User]] = {
-    val queryParams = Map(
+    val queryParams = queryParamsMap(
       "query" -> query,
       "page" -> page,
       "per_page" -> perPage

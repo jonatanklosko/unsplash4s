@@ -15,7 +15,7 @@ class Photos(
   httpClient: HttpClient
 )(
   implicit ec: ExecutionContext = ExecutionContext.global
-) {
+) extends BaseRepository {
   def getPhoto(id: String): Future[Photo] = {
     httpClient.apiGet[Photo](s"/photos/$id")
   }
@@ -25,7 +25,7 @@ class Photos(
     perPage: Int = 10,
     orderBy: PhotoOrderBy = PhotoOrderBy.Latest
   ): Future[Seq[Photo]] = {
-    val query = Map(
+    val query = queryParamsMap(
       "page" -> page,
       "per_page" -> perPage,
       "order_by" -> orderBy
@@ -42,7 +42,7 @@ class Photos(
     orientation: Option[PhotoOrientation] = None,
     contentFilter: Option[ContentFilter] = None
   ): Future[Seq[Photo]] = {
-    val queryParams = Map(
+    val queryParams = queryParamsMap(
       "count" -> count,
       "query" -> query,
       "featured" -> featured,
@@ -61,7 +61,7 @@ class Photos(
     orderBy: PhotoOrderBy = PhotoOrderBy.Latest,
     orientation: Option[PhotoOrientation] = None
   ): Future[Seq[Photo]] = {
-    val query = Map(
+    val query= queryParamsMap(
       "page" -> page,
       "per_page" -> perPage,
       "order_by" -> orderBy,
@@ -76,7 +76,7 @@ class Photos(
     perPage: Int = 10,
     orientation: Option[PhotoOrientation] = None
   ): Future[Seq[Photo]] = {
-    val query = Map(
+    val query= queryParamsMap(
       "page" -> page,
       "per_page" -> perPage,
       "orientation" -> orientation
@@ -92,7 +92,7 @@ class Photos(
     orientation: Option[PhotoOrientation] = None,
     contentFilter: Option[ContentFilter] = None
   ): Future[SearchResult[Photo]] = {
-    val queryParams = Map(
+    val queryParams= queryParamsMap(
       "query" -> query,
       "page" -> page,
       "per_page" -> perPage,

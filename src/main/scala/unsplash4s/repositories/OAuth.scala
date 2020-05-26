@@ -14,7 +14,7 @@ import scala.concurrent.Future
 class OAuth(
   httpClient: HttpClient,
   appConfig: UnsplashAppConfig
-) {
+) extends BaseRepository {
   def authorizationUrl(
     scope: Set[Scope] = Set(Scope.Public)
   ): String = {

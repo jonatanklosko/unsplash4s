@@ -45,7 +45,7 @@ class HttpClient(
       .map(jsonResponseToEntity[T])
   }
 
-  def apiGet[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
+  def apiGet[T: Decoder](path: String, query: Map[String, String] = Map()): Future[T] = {
     get(uri"${appConfig.apiUrl + path}?$query")
   }
 
@@ -53,7 +53,7 @@ class HttpClient(
     post(uri"${appConfig.apiUrl + path}", body)
   }
 
-  def apiDelete[T: Decoder](path: String, query: Map[String, Any] = Map()): Future[T] = {
+  def apiDelete[T: Decoder](path: String, query: Map[String, String] = Map()): Future[T] = {
     delete(uri"${appConfig.apiUrl + path}?$query")
   }
 
