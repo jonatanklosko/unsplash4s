@@ -6,10 +6,12 @@ import unsplash4s.Decoders._
 import unsplash4s.HttpClient
 import unsplash4s.entities.{Collection, SearchResult}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class Collections(
   httpClient: HttpClient
+)(
+  implicit ec: ExecutionContext = ExecutionContext.global
 ) {
   def getCollection(id: Int): Future[Collection] = {
     httpClient.apiGet[Collection](s"/collections/$id")
@@ -69,27 +71,30 @@ class Collections(
     httpClient.apiPost[Collection](s"/collections", Some(body))
   }
 
-  def deleteCollection(id: Int): Future[Json] = {
+  def deleteCollection(id: Int): Future[Unit] = {
     httpClient.apiDelete[Json](s"/collections/$id")
+      .map(_ => ())
   }
 
   def addPhotoToCollection(
     id: Int,
     photoId: String
-  ): Future[Json] = {
+  ): Future[Unit] = {
     val body = Json.obj(
       "photo_id" -> photoId.asJson
     ).toString
     httpClient.apiPost[Json](s"/collections/$id/add", Some(body))
+      .map(_ => ())
   }
 
   def removePhotoFromCollection(
     id: Int,
     photoId: String
-  ): Future[Json] = {
+  ): Future[Unit] = {
     val query = Map(
       "photo_id" -> photoId,
     )
     httpClient.apiDelete[Json](s"/collections/$id/remove", query)
+      .map(_ => ())
   }
 }

@@ -9,10 +9,12 @@ import unsplash4s.repositories.Photos.PhotoOrderBy
 import unsplash4s.repositories.Photos.PhotoOrderBy.PhotoOrderBy
 import unsplash4s.repositories.Photos.PhotoOrientation.PhotoOrientation
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class Photos(
   httpClient: HttpClient
+)(
+  implicit ec: ExecutionContext = ExecutionContext.global
 ) {
   def getPhoto(id: String): Future[Photo] = {
     httpClient.apiGet[Photo](s"/photos/$id")
@@ -101,16 +103,19 @@ class Photos(
     httpClient.apiGet[SearchResult[Photo]](s"/search/photos", queryParams)
   }
 
-  def likePhoto(id: String): Future[Json] = {
+  def likePhoto(id: String): Future[Unit] = {
     httpClient.apiPost[Json](s"/photos/$id/like", None)
+      .map(_ => ())
   }
 
-  def unlikePhoto(id: String): Future[Json] = {
+  def unlikePhoto(id: String): Future[Unit] = {
     httpClient.apiDelete[Json](s"/photos/$id/like")
+      .map(_ => ())
   }
 
-  def triggerPhotoDownload(id: String): Future[Json] = {
+  def triggerPhotoDownload(id: String): Future[Unit] = {
     httpClient.apiGet[Json](s"/photos/$id/download")
+      .map(_ => ())
   }
 }
 
