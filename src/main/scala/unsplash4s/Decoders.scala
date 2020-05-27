@@ -212,4 +212,58 @@ object Decoders {
       )
     }
   }
+
+  implicit val statisticDecoder: Decoder[Statistic] = (c: HCursor) =>(
+    for {
+      downloads <- c.downField("downloads").as[StatisticData]
+      views <- c.downField("views").as[StatisticData]
+      likes <- c.downField("likes").as[StatisticData]
+    } yield{
+      Statistic(
+        downloads = downloads,
+        views = views,
+        likes = likes
+      )
+    }
+  )
+
+   implicit val statisticDataDecoder: Decoder[StatisticData] = (c: HCursor) =>(
+    for {
+      total <- c.downField("total").as[Int]
+      historical <- c.downField("historical").as[Historical]
+    } yield{
+      StatisticData(
+        total = total,
+        historical = historical
+      )
+    }
+  )
+
+   implicit val historicalDecoder: Decoder[Historical] = (c: HCursor) =>(
+    for {
+      change <- c.downField("change").as[Int]
+      resolution <- c.downField("resolution").as[String]
+      quantity <- c.downField("quantity").as[Int]
+      values <- c.downField("values").as[Seq[Value]]
+    } yield{
+      Historical(
+       change = change,
+       resolution = resolution,
+       quantity = quantity,
+       values = values
+      )
+    }
+  )
+
+   implicit val valueDecoder: Decoder[Value] = (c: HCursor) =>(
+    for {
+      date <- c.downField("date").as[String]
+      value <- c.downField("value").as[Int]
+    } yield{
+      Value(
+        date = date,
+        value = value
+      )
+    }
+  )
 }

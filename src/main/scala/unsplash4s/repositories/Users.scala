@@ -2,7 +2,7 @@ package unsplash4s.repositories
 
 import unsplash4s.Decoders._
 import unsplash4s.HttpClient
-import unsplash4s.entities.{SearchResult, User}
+import unsplash4s.entities.{SearchResult, Statistic, User}
 
 import scala.concurrent.Future
 
@@ -24,5 +24,9 @@ class Users(
       "per_page" -> perPage
     )
     httpClient.apiGet[SearchResult[User]](s"/search/users", queryParams)
+  }
+
+  def getUserStatistics(username: String): Future[Statistic] = {
+    httpClient.apiGet[Statistic](s"/users/$username/statistics")
   }
 }

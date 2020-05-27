@@ -48,4 +48,28 @@ class UsersSpec extends BaseIntegrationSpec {
     searchResult.totalPages shouldEqual 1819
     searchResult.results should have size 10
   }
+
+  "Users > getUserStatistics" should "return a future resolving to a list of statistic data" in {
+    val username = "ramche"
+    val unsplash = getUnsplash(stubBackend => {
+      stubBackend
+        .whenRequestMatches(_.uri.path == List("users", username, "statistics"))
+        .thenRespondWrapped(Future {
+          val json = Source.fromResource("responses/user-statistics.json").mkString
+          Response(json, StatusCode.Ok)
+        })
+    })
+    val statisticsResultF = unsplash.users.getUserStatistics(username)
+    val statisticsResult = Await.result(statisticsResultF, 1.second)
+
+    statisticsResult.downloads.total shouldEqual 241570
+    statisticsResult.downloads.historical.change shouldEqual 21319
+    statisticsResult.downloads.historical.values(0).value shouldEqual 923
+    statisticsResult.views.total shouldEqual 58837477
+    statisticsResult.views.historical.change shouldEqual 4845035
+    statisticsResult.views.historical.values(0).value shouldEqual 195672
+    statisticsResult.likes.total shouldEqual 5340
+    statisticsResult.likes.historical.change shouldEqual 296
+    statisticsResult.likes.historical.values(0).value shouldEqual 9
+  }
 }

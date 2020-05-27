@@ -10,7 +10,7 @@ object GetCollections {
     val unsplash = new Unsplash(Examples.unsplashAppConfig)
 
     unsplash.collections.getCollections().onComplete {
-      case Success(collections) => println("Collections: " +collections.map(_.title).mkString(", "))
+      case Success(collections) => println("Collections: " + collections.map(_.title).mkString(", "))
       case Failure(error) => println(error)
     }
 

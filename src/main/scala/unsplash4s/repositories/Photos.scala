@@ -3,7 +3,7 @@ package unsplash4s.repositories
 import io.circe.Json
 import unsplash4s.Decoders._
 import unsplash4s.HttpClient
-import unsplash4s.entities.{Photo, SearchResult}
+import unsplash4s.entities.{Photo, SearchResult, Statistic}
 import unsplash4s.repositories.Photos.ContentFilter.ContentFilter
 import unsplash4s.repositories.Photos.PhotoOrderBy
 import unsplash4s.repositories.Photos.PhotoOrderBy.PhotoOrderBy
@@ -116,6 +116,10 @@ class Photos(
   def triggerPhotoDownload(id: String): Future[Unit] = {
     httpClient.apiGet[Json](s"/photos/$id/download")
       .map(_ => ())
+  }
+
+  def getPhotoStatistics(id: String): Future[Statistic] = {
+    httpClient.apiGet[Statistic](s"/photos/$id/statistics")
   }
 }
 

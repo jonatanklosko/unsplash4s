@@ -118,4 +118,28 @@ class PhotosSpec extends BaseIntegrationSpec {
     searchResult.totalPages shouldEqual 1038
     searchResult.results should have size 10
   }
+
+  "Photo > getPhotoStatistics" should "return a future resolving to a list of statistic data" in {
+    val id = "9SWHIgu8A8k""
+    val unsplash = getUnsplash(stubBackend => {
+      stubBackend
+        .whenRequestMatches(_.uri.path == List("photos", id, "statistics"))
+        .thenRespondWrapped(Future {
+          val json = Source.fromResource("responses/photo-statistics.json").mkString
+          Response(json, StatusCode.Ok)
+        })
+    })
+    val statisticsResultF = unsplash.photos.getPhotoStatistics(id)
+    val statisticsResult = Await.result(statisticsResultF, 1.second)
+
+    statisticsResult.downloads.total shouldEqual 50489
+    statisticsResult.downloads.historical.change shouldEqual 6740
+    statisticsResult.downloads.historical.values(0).value shouldEqual 239
+    statisticsResult.views.total shouldEqual 13570670
+    statisticsResult.views.historical.change shouldEqual 1903051
+    statisticsResult.views.historical.values(0).value shouldEqual 50834
+    statisticsResult.likes.total shouldEqual 712
+    statisticsResult.likes.historical.change shouldEqual  56
+    statisticsResult.likes.historical.values(0).value shouldEqual 0
+  }
 }
