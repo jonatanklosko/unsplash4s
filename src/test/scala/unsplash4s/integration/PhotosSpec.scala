@@ -120,7 +120,7 @@ class PhotosSpec extends BaseIntegrationSpec {
   }
 
   "Photo > getPhotoStatistics" should "return a future resolving to a list of statistic data" in {
-    val id = "9SWHIgu8A8k""
+    val id = "9SWHIgu8A8k"
     val unsplash = getUnsplash(stubBackend => {
       stubBackend
         .whenRequestMatches(_.uri.path == List("photos", id, "statistics"))

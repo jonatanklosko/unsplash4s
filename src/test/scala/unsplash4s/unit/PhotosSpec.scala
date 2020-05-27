@@ -2,8 +2,6 @@ package unsplash4s.unit
 
 import unsplash4s.entities.Photo
 import unsplash4s.repositories.Photos
-import unsplash4s.repositories.Photos.ContentFilter.ContentFilter
-import unsplash4s.repositories.Photos.PhotoOrientation.PhotoOrientation
 import unsplash4s.repositories.Photos.{ContentFilter, PhotoOrderBy, PhotoOrientation}
 import unsplash4s.utils.BaseUnitSpec
 
@@ -16,7 +14,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   "Photo > getPhotos" should "call apiGet with default params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/photos",
       Map(
         "page" -> "1",
@@ -30,7 +28,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   it should "allow for specifying page, per page and order" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/photos",
       Map(
         "page" -> "5",
@@ -44,7 +42,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   "Photo > getRandomPhotos" should "call apiGet with default params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/photos/random",
       Map("count" -> "1")
     )
@@ -54,7 +52,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   it should "allow for specifying query params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/photos/random",
       Map(
         "count" -> "2",
@@ -80,7 +78,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   "Photo > getUserPhotos" should "call apiGet with default params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/users/sherlock/photos",
       Map(
         "page" -> "1",
@@ -94,7 +92,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   it should "allow for specifying query params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/users/sherlock/photos",
       Map(
         "page" -> "2",
@@ -115,7 +113,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   "Photo > getCollectionPhotos" should "call apiGet with default params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/collections/111/photos",
       Map(
         "page" -> "1",
@@ -128,7 +126,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   it should "allow for specifying query params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/collections/111/photos",
       Map(
         "page" -> "5",
@@ -147,7 +145,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   "Photo > searchPhotos" should "call apiGet with search and default params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/search/photos",
       Map(
         "query" -> "cats",
@@ -161,7 +159,7 @@ class PhotosSpec extends BaseUnitSpec {
   }
 
   it should "allow for specifying query params" in {
-    val httpClient = httpClientExpectingApiGet[Photo](
+    val httpClient = httpClientExpectingApiGet[Seq[Photo]](
       "/search/photos",
       Map(
         "query" -> "cats",

@@ -12,7 +12,7 @@ class UsersSpec extends BaseUnitSpec {
     users.getUser("sherlock")
   }
 
-  "Users > getUsers" should "call apiGet on http client with query and default params" in {
+  "Users > searchUsers" should "call apiGet on http client with query and default params" in {
     val httpClient = httpClientExpectingApiGet[Seq[User]](
       "/search/users",
       Map(
